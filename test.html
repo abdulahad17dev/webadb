@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="index.js"></script>
+  <title>Document</title>
+</head>
+
+<style>
+  * {
+    font-family: segoe, sans-serif;
+  }
+
+  html {
+    padding: 20px;
+    margin: 0;
+  }
+
+  body {
+    width: 600px;
+    margin: 0 auto;
+  }
+
+  #buttons {
+    margin-left: 10px;
+  }
+
+  button {
+    margin-right: 1em;
+  }
+
+  #messages {
+    border: 1px black solid;
+    width: 31em;
+    margin-top: 1em;
+    padding: 0 1em;
+  }
+
+  #fileSelector {
+    display: none;
+    width: 33em;
+  }
+</style>
+
+<body>
+
+  <div id="bodyElement">
+    <div id="buttons">
+      <button id="openButton">Create/Open DB</button>
+      <!-- Clicking this opens the database. If there's no database to open, a database is created. -->
+      <button id="populateButton">Populate DB</button>
+      <button id="displayButton">Display DB</button>
+      <button id="deleteButton">Delete DB</button>
+      <button id="downloadButton">Download</button>
+    </div>
+    <div id="messages">
+      <p>If the database does not exist, clicking <strong>Create/Open DB</strong> creates it. If the database already
+        exists, clicking <strong>Create/Open DB</strong> opens it.</p>
+      <p>Thus, you must click the <strong>Create/Open DB</strong> button before clicking the <strong>Populate
+          DB</strong> button.</p>
+    </div>
+    <p>
+      <input type="file" id="fileSelector" multiple>
+      <!-- Only display this element when the database is ready. -->
+    </p>
+
+  </div>
+
+</body>
+
+</html>
