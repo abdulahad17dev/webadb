@@ -63,6 +63,7 @@ function requiredFeaturesSupported() {
 // ---------------------------------------------------------------------------------------------------
 
 document.addEventListener("DOMContentLoaded", function () {
+  openDB();
   if (requiredFeaturesSupported()) {
     // Add event listeners for the four database related buttons:
     document
@@ -277,7 +278,7 @@ function populateDB() {
 
 // ---------------------------------------------------------------------------------------------------
 
-function displayDB() {
+async function displayDB() {
   console.log("displayDB()");
 
   var db = dbGlobals.db;
@@ -305,6 +306,7 @@ function displayDB() {
     try {
       var cursorRequest = objectStore.openCursor();
 
+      const { usage, quota } = await navigator.storage.estimate();
       cursorRequest.onerror = function (evt) {
         console.log(
           "cursorRequest.onerror fired in displayDB() - error code: " +
@@ -312,8 +314,12 @@ function displayDB() {
         );
       };
 
-      var fileListHTML =
-        "<p><strong>File(s) in database:</strong></p><ul style='margin: -0.5em 0 1em -1em;'>"; // Be aware that if the database is empty, this variable never gets used.
+      var fileListHTML = `<p><strong>File(s) in database:</strong></p><ul style='margin: -0.5em 0 1em -1em;'>`; // Be aware that if the database is empty, this variable never gets used.
+      fileListHTML += `<p><strong>quota: ${Intl.NumberFormat().format(
+        bytesToMB(quota)
+      )} mb, usage: ${Intl.NumberFormat().format(
+        bytesToMB(usage)
+      )} mb </strong></p><ul style='margin: -0.5em 0 1em -1em;'>`; // Be aware that if the database is empty, this variable never gets used.
 
       cursorRequest.onsuccess = function (evt) {
         console.log("cursorRequest.onsuccess fired in displayDB()");
@@ -323,14 +329,14 @@ function displayDB() {
         if (cursor) {
           dbGlobals.empty = false; // If we're here, there's at least one object in the database's object store (i.e., the database is not empty).
           fileListHTML += "<li>" + cursor.value.name;
+          //   fileListHTML +=
+          //     "<p style='margin: 0 0 0 0.75em;'>" +
+          //     cursor.value.lastModifiedDate +
+          //     "</p>";
           fileListHTML +=
             "<p style='margin: 0 0 0 0.75em;'>" +
-            cursor.value.lastModifiedDate +
-            "</p>";
-          fileListHTML +=
-            "<p style='margin: 0 0 0 0.75em;'>" +
-            cursor.value.size +
-            " bytes</p>";
+            bytesToMB(cursor.value.size) +
+            " mb</p>";
           cursor.continue(); // Move to the next object (that is, file) in the object store.
         } else {
           fileListHTML += "</ul>";
@@ -427,4 +433,8 @@ function download() {
   getRequest.onerror = function () {
     console.error("Error retrieving file from IndexedDB:", getRequest.error);
   };
+}
+
+function bytesToMB(bytes) {
+  return (bytes / (1024 * 1024)).toFixed(2);
 }
