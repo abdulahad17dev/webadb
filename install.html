@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebUSB and WebADB Example</title>
+</head>
+
+<body>
+    <h1>WebUSB and WebADB Example</h1>
+    <button id="connectButton">Connect to Device</button>
+    <br>
+    <br>
+    <input type="file" id="apkInput" accept=".apk" />
+    <br>
+    <br>
+    <button id="installButton">Install APK</button>
+
+    <script src="adb.bundle.js"></script>
+
+    <script>
+        var AdbEventLogger = /** @class */ (function () {
+            function AdbEventLogger() {
+                var _this = this;
+                this._incomingPacketEvent = new EventEmitter();
+                this._outgoingPacketEvent = new EventEmitter();
+                this._logger = {
+                    onIncomingPacket: function (packet) {
+                        _this._incomingPacketEvent.fire(packet);
+                    },
+                    onOutgoingPacket: function (packet) {
+                        _this._outgoingPacketEvent.fire(packet);
+                    }
+                };
+            }
+            Object.defineProperty(AdbEventLogger.prototype, "logger", {
+                get: function () { return this._logger; },
+                enumerable: false,
+                configurable: true
+            });
+            Object.defineProperty(AdbEventLogger.prototype, "onIncomingPacket", {
+                get: function () { return this._incomingPacketEvent.event; },
+                enumerable: false,
+                configurable: true
+            });
+            Object.defineProperty(AdbEventLogger.prototype, "onOutgoingPacket", {
+                get: function () { return this._outgoingPacketEvent.event; },
+                enumerable: false,
+                configurable: true
+            });
+            return AdbEventLogger;
+        }());
+
+        document.addEventListener('DOMContentLoaded', async function () {
+            const connectButton = document.getElementById('connectButton');
+            const apkInput = document.getElementById('apkInput');
+            const installButton = document.getElementById('installButton');
+
+            let adb;
+
+            connectButton.addEventListener('click', async function () {
+                try {
+                    // Request USB device access with vendor ID filters
+                    // const usbDevice = await navigator.usb.requestDevice({
+                    //     filters: [
+                    //         { classCode: 255, subclassCode: 66, protocolCode: 1 },
+                    //         { classCode: 255, subclassCode: 66, protocolCode: 3 },
+                    //     ]
+                    // });
+
+                    // console.log('USB Device connected:', usbDevice.productName);
+
+                    // // Create an ADB instance
+                    // adb = new window.WebADB.Adb();
+
+                    // // Connect to the device using ADB
+                    // await adb.connect(usbDevice);
+                    // console.log(usbDevice);
+                    let adbWebBackend = await AdbWebBackend.requestDevice();
+                    console.log(adbWebBackend);
+                    if (adbWebBackend) {
+                        let logger = new AdbEventLogger();
+                        adb = new Adb(adbWebBackend, logger);
+                        await adb.connect();
+                        let res = await adb.getProp('ro.build.version.release');
+                        console.log(res);
+                    } else {
+                        console.log('no device found');
+                    }
+                } catch (error) {
+                    console.error('Error connecting to device:', error);
+                }
+            });
+
+            installButton.addEventListener('click', async function () {
+                if (!adb) {
+                    console.log('No ADB device connected. Click "Connect to Device" first.');
+                    return;
+                }
+
+                const apkFile = apkInput.files;
+                if (!apkFile) {
+                    console.log('Please select an APK file.');
+                    return;
+                }
+
+                try {
+                    // Trigger the APK installation
+                    await adb.install(apkFile, null);
+                    console.log('Installation successful.');
+                } catch (error) {
+                    console.error('Installation failed:', error);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

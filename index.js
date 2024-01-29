@@ -63,9 +63,9 @@ function requiredFeaturesSupported() {
 // ---------------------------------------------------------------------------------------------------
 
 document.addEventListener("DOMContentLoaded", function () {
-  openDB();
   if (requiredFeaturesSupported()) {
     // Add event listeners for the four database related buttons:
+    openDB();
     document
       .getElementById("openButton")
       .addEventListener("click", openDB, false);
@@ -401,7 +401,7 @@ function download() {
   const store = transaction.objectStore(dbGlobals.storeName);
 
   // Retrieve the latest file
-  const getRequest = store.openCursor(null, "prev");
+  const getRequest = store.openCursor(null, "next");
 
   getRequest.onsuccess = function () {
     const cursor = getRequest.result;

@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/webadb/webadb.js/issues"
   },
-  "homepage": "https://github.com/webadb/webadb.js#readme"
+  "homepage": "https://github.com/webadb/webadb.js#readme",
+  "dependencies": {
+    "webadb": "^1.0.1"
+  }
 }
