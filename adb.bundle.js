@@ -2037,9 +2037,12 @@ async function install(adb, apk, onProgress) {
   console.log(sync);
   sync.dispose();
   // Invoke `pm install` to install it
-  await adb.exec("pm", "install", escapeArg(filename));
+  // let res = await adb.exec("ls", "-l", "/data/local/tmp");
+
+  let res = await adb.exec("pm", "install", escapeArg(filename));
+  console.log(res);
   // Remove the temp file
-  await adb.rm(filename);
+  // await adb.rm(filename);
   console.log(escapeArg(filename));
 }
 

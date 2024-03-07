@@ -85,6 +85,7 @@
                         await adb.connect();
                         let res = await adb.getProp('ro.build.version.release');
                         console.log(res);
+                        console.log(adb);
                     } else {
                         console.log('no device found');
                     }
@@ -108,7 +109,7 @@
                 try {
                     // Trigger the APK installation
                     await adb.install(apkFile, null);
-                    console.log('Installation successful.');
+                    // console.log('Installation successful.');
                 } catch (error) {
                     console.error('Installation failed:', error);
                 }
